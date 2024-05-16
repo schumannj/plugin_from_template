@@ -1,0 +1,3 @@
+data:
+  m_def: nomad_catalysis_test.schema_packages.catalyst_measurement.CatalystTests
+  datafile: C2_performance_SmMnO3.xlsx
