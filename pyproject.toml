@@ -74,7 +74,7 @@ select = [
     "UP",
     # isort
     "I",
-    # pylint 
+    # pylint
     "PL",
 ]
 
@@ -110,5 +110,6 @@ where = ["src"]
 [project.entry-points.'nomad.plugin']
 myparser = "nomad_catalysis_test.parsers:myparser"
 mypackage = "nomad_catalysis_test.schema_packages:mypackage"
+catalystmeasurement = "nomad_catalysis_test.schema_packages:catalystmeasurement"
 
 myapp = "nomad_catalysis_test.apps:myapp"

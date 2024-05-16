@@ -1,0 +1,61 @@
+definitions:
+  name: 'A schema for catalyst tests' # The main section that contains the quantities to be read from an excel file
+  # This name can be changed freely.
+  sections:
+    CatalystTests:
+      base_sections:
+        - nomad.datamodel.metainfo.basesections.CompositeSystem
+        - nomad.datamodel.data.EntryData
+      quantities:
+        name:
+          type: str
+          m_annotations:
+            eln:
+              component: StringEditQuantity
+        data_file:
+          type: str
+          m_annotations:
+            eln:
+              component: FileEditQuantity
+        reaction_class:
+          type: str
+          m_annotations:
+            eln:
+              component: StringEditQuantity
+        location:
+          type: str
+          m_annotations:
+            eln:
+              component: StringEditQuantity
+        reaction_name:
+          type: str
+          m_annotations:
+            eln:
+              component: StringEditQuantity
+        experimenter:
+          type: str
+          m_annotations:
+            eln:
+              component: StringEditQuantity
+      sub_sections:
+        samples:
+          repeats: True
+          section:
+            basesections: nomad.datamodel.metainfo.basesections.CompositeSystemReference
+            quantities:
+              name:
+                type: str
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
+              lab_id:
+                type: str
+                m_annotations:
+                  eln:
+                    component: StringEditQuantity
+              reference:
+                type: nomad.datamodel.metainfo.basesections.CompositeSystem
+                m_annotations:
+                  eln:
+                    component: ReferenceEditQuantity
+                    label: 'Composite System Reference'
