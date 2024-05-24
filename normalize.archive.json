@@ -1,0 +1,132 @@
+{
+  "data": {
+    "m_def": "nomad_catalysis_test.schema_packages.catalyst_measurement.CatalystTests",
+    "name": "test catalystmeasurement",
+    "datetime": "2024-05-16T18:34:53.449894+00:00"
+  },
+  "metadata": {
+    "entry_name": "test_catalystmeasurement.archive.yaml",
+    "entry_type": "CatalystTests",
+    "mainfile": "/workspaces/plugin_from_template/tests/data/test_catalystmeasurement.archive.yaml",
+    "text_search_contents": [
+      "test catalystmeasurement"
+    ],
+    "n_quantities": 12,
+    "quantities": [
+      "",
+      "data",
+      "data.datetime",
+      "data.name",
+      "metadata",
+      "metadata.entry_name",
+      "metadata.entry_type",
+      "metadata.mainfile",
+      "metadata.quantities",
+      "metadata.section_defs",
+      "metadata.section_defs.definition_id",
+      "metadata.section_defs.definition_qualified_name",
+      "metadata.section_defs.used_directly",
+      "metadata.sections",
+      "results",
+      "results.eln",
+      "results.eln.names",
+      "results.eln.sections",
+      "results.properties"
+    ],
+    "sections": [
+      "nomad.datamodel.datamodel.EntryArchive",
+      "nomad.datamodel.datamodel.EntryMetadata",
+      "nomad.datamodel.results.ELN",
+      "nomad.datamodel.results.Properties",
+      "nomad.datamodel.results.Results",
+      "nomad_catalysis_test.schema_packages.catalyst_measurement.CatalystTests"
+    ],
+    "section_defs": [
+      {
+        "definition_qualified_name": "nomad.datamodel.data.ArchiveSection",
+        "definition_id": "7047cbff9980abff17cce4b1b6b0d1c783505b7f",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.data.EntryData",
+        "definition_id": "538f52fd8d52b29372066f878319c6aeb03b74d2",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.datamodel.EntryArchive",
+        "definition_id": "4f8220ef0081f34a08e0cb211ca52e2ee7cc4d1b",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.datamodel.EntryMetadata",
+        "definition_id": "08e24de48352035bcc932ed9934875ed9b10188e",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.BaseSection",
+        "definition_id": "add2edfa25a61ff3bbfdebacc870181f64f41634",
+        "used_directly": false
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.CompositeSystem",
+        "definition_id": "c7254c9b461a4baec86cb3179e2f84513f5c9053",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.Entity",
+        "definition_id": "7ce6bdcaa183a9685582b275e1c2b2ea3139c74d",
+        "used_directly": false
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.System",
+        "definition_id": "3ab3a09d615ab58aefbaa3acdd8d6af4e73aaae5",
+        "used_directly": false
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.ELN",
+        "definition_id": "eeed330bd18d40f3a2a00cc35ba6f58808d0c543",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.Properties",
+        "definition_id": "f6d62b2664a0c37e0c82d4cb570e5e177e445e05",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.Results",
+        "definition_id": "d77c26594ec0501fb0de8daaa4d7b25d54b9e0cf",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_catalysis_test.schema_packages.catalyst_measurement.CatalystTests",
+        "definition_id": "0c0260fdf430d17a321dcba5f78195558badec48",
+        "used_directly": true
+      }
+    ],
+    "search_quantities": [
+      {
+        "id": "data.name#nomad_catalysis_test.schema_packages.catalyst_measurement.CatalystTests",
+        "definition": "nomad_catalysis_test.schema_packages.catalyst_measurement.CatalystTests.name",
+        "path_archive": "data.name",
+        "str_value": "test catalystmeasurement"
+      },
+      {
+        "id": "data.datetime#nomad_catalysis_test.schema_packages.catalyst_measurement.CatalystTests",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.datetime",
+        "datetime_value": "2024-05-16T18:34:53.449894+00:00"
+      }
+    ]
+  },
+  "results": {
+    "properties": {},
+    "eln": {
+      "sections": [
+        "CatalystTests"
+      ],
+      "names": [
+        "test catalystmeasurement"
+      ]
+    }
+  }
+}
