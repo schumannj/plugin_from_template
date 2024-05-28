@@ -120,7 +120,7 @@ def add_activity(archive):
         archive.results.properties.catalytic.reaction = Reaction()
 
 
-class NVRSpectroscopy(Measurement, PlotSection, EntryData):
+class NVRSpectroscopy(Measurement, PlotSection, EntryData, ArchiveSection):
     measurements_data_file = Quantity(
         type=str,
         description="""
