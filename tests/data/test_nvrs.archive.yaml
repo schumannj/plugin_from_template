@@ -1,0 +1,3 @@
+data:
+  m_def: nomad_catalysis_test.schema_packages.catalyst_measurement.NRVSpectroscopy
+  measurements_data_file: ReRH_Nia-C_H_NRVS_exp.dat

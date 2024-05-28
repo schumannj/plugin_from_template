@@ -42,6 +42,7 @@ from nomad.datamodel.metainfo.plot import PlotSection, PlotlyFigure
 import plotly.express as px
 import plotly.graph_objs as go
 from nomad.datamodel.metainfo.annotations import ELNAnnotation
+from nomad.datamodel.metainfo.basesections import Measurement
 from nomad.datamodel.data import (
     EntryData,
     ArchiveSection,
@@ -120,7 +121,7 @@ def add_activity(archive):
         archive.results.properties.catalytic.reaction = Reaction()
 
 
-class NVRSpectroscopy(Measurement, PlotSection, EntryData, ArchiveSection):
+class NRVSpectroscopy(Measurement, PlotSection, EntryData):
     measurements_data_file = Quantity(
         type=str,
         description="""
