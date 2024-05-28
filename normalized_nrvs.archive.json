@@ -1,0 +1,161 @@
+{
+  "data": {
+    "m_def": "nomad_catalysis_test.schema_packages.catalyst_measurement.NRVSpectroscopy",
+    "name": "test nrvs",
+    "datetime": "2024-05-28T20:29:40.378572+00:00",
+    "measurements_data_file": "ReRH_Nia-C_H_NRVS_exp.dat"
+  },
+  "workflow2": {
+    "name": "test nrvs"
+  },
+  "metadata": {
+    "entry_name": "test_nrvs.archive.yaml",
+    "entry_type": "NRVSpectroscopy",
+    "mainfile": "/workspaces/plugin_from_template/tests/data/test_nrvs.archive.yaml",
+    "text_search_contents": [
+      "ReRH_Nia-C_H_NRVS_exp.dat",
+      "test nrvs"
+    ],
+    "n_quantities": 16,
+    "quantities": [
+      "",
+      "data",
+      "data.datetime",
+      "data.measurements_data_file",
+      "data.name",
+      "metadata",
+      "metadata.entry_name",
+      "metadata.entry_type",
+      "metadata.mainfile",
+      "metadata.quantities",
+      "metadata.section_defs",
+      "metadata.section_defs.definition_id",
+      "metadata.section_defs.definition_qualified_name",
+      "metadata.section_defs.used_directly",
+      "metadata.sections",
+      "results",
+      "results.eln",
+      "results.eln.methods",
+      "results.eln.names",
+      "results.eln.sections",
+      "results.properties",
+      "workflow2",
+      "workflow2.name"
+    ],
+    "sections": [
+      "nomad.datamodel.datamodel.EntryArchive",
+      "nomad.datamodel.datamodel.EntryMetadata",
+      "nomad.datamodel.metainfo.workflow.Workflow",
+      "nomad.datamodel.results.ELN",
+      "nomad.datamodel.results.Properties",
+      "nomad.datamodel.results.Results",
+      "nomad_catalysis_test.schema_packages.catalyst_measurement.NRVSpectroscopy"
+    ],
+    "section_defs": [
+      {
+        "definition_qualified_name": "nomad.datamodel.data.ArchiveSection",
+        "definition_id": "7047cbff9980abff17cce4b1b6b0d1c783505b7f",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.data.EntryData",
+        "definition_id": "538f52fd8d52b29372066f878319c6aeb03b74d2",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.datamodel.EntryArchive",
+        "definition_id": "4f8220ef0081f34a08e0cb211ca52e2ee7cc4d1b",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.datamodel.EntryMetadata",
+        "definition_id": "08e24de48352035bcc932ed9934875ed9b10188e",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.Activity",
+        "definition_id": "fc2735d177bf36f9718ca66a764a56fc0c6200a0",
+        "used_directly": false
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.BaseSection",
+        "definition_id": "add2edfa25a61ff3bbfdebacc870181f64f41634",
+        "used_directly": false
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.Measurement",
+        "definition_id": "92a193e908065fa4ff809fb88e83e3057876be33",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.plot.PlotSection",
+        "definition_id": "7bb17e35ed91dca88bf6238fc51ed212693593d0",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.workflow.Task",
+        "definition_id": "ac62fdff74f54fd477531446ca111c0dd9df6ba2",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.workflow.Workflow",
+        "definition_id": "fc65ae24157492e422afe61173a71403fc5e1fd7",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.ELN",
+        "definition_id": "eeed330bd18d40f3a2a00cc35ba6f58808d0c543",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.Properties",
+        "definition_id": "f6d62b2664a0c37e0c82d4cb570e5e177e445e05",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.Results",
+        "definition_id": "d77c26594ec0501fb0de8daaa4d7b25d54b9e0cf",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_catalysis_test.schema_packages.catalyst_measurement.NRVSpectroscopy",
+        "definition_id": "0392bb2cf0df864b528206ac8116e7931ddd0ed6",
+        "used_directly": true
+      }
+    ],
+    "search_quantities": [
+      {
+        "id": "data.measurements_data_file#nomad_catalysis_test.schema_packages.catalyst_measurement.NRVSpectroscopy",
+        "definition": "nomad_catalysis_test.schema_packages.catalyst_measurement.NRVSpectroscopy.measurements_data_file",
+        "path_archive": "data.measurements_data_file",
+        "str_value": "ReRH_Nia-C_H_NRVS_exp.dat"
+      },
+      {
+        "id": "data.name#nomad_catalysis_test.schema_packages.catalyst_measurement.NRVSpectroscopy",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.name",
+        "path_archive": "data.name",
+        "str_value": "test nrvs"
+      },
+      {
+        "id": "data.datetime#nomad_catalysis_test.schema_packages.catalyst_measurement.NRVSpectroscopy",
+        "definition": "nomad.datamodel.metainfo.basesections.Activity.datetime",
+        "path_archive": "data.datetime",
+        "datetime_value": "2024-05-28T20:29:40.378572+00:00"
+      }
+    ]
+  },
+  "results": {
+    "properties": {},
+    "eln": {
+      "sections": [
+        "NRVSpectroscopy"
+      ],
+      "names": [
+        "test nrvs"
+      ],
+      "methods": [
+        "NRVSpectroscopy"
+      ]
+    }
+  }
+}

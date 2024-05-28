@@ -145,7 +145,7 @@ def add_activity(archive):
 
 
 class NRVSpectroscopy(Measurement, PlotSection, EntryData):
-    measurements_data_file = Quantity(
+    measurement_data_file = Quantity(
         type=str,
         description="""
             experimental tab data file
@@ -176,10 +176,10 @@ class NRVSpectroscopy(Measurement, PlotSection, EntryData):
 
     def normalize(self, archive, logger):
         super(NRVSpectroscopy, self).normalize(archive, logger)
-        if self.measurements_data_file is None:
+        if self.measurement_data_file is None:
             return
 
-        if (self.measurements_data_file is not None) and (
+        if (self.measurement_data_file is not None) and (
             os.path.splitext(self.measurement_data_file)[-1] != '.dat'
         ):
             raise ValueError('Unsupported file format. Only .dat file')
