@@ -23,6 +23,9 @@ from typing import (
 import numpy as np
 import plotly.express as px
 import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+import json
+
 from ase.data import chemical_symbols
 from nomad.datamodel.data import (
     ArchiveSection,
@@ -55,7 +58,6 @@ from nomad.metainfo import (
     SubSection,
 )
 from nomad.units import ureg
-
 if TYPE_CHECKING:
     from nomad.datamodel.datamodel import (
         EntryArchive,
@@ -65,8 +67,7 @@ if TYPE_CHECKING:
     )
 
 
-from plotly.subplots import make_subplots
-import json
+
 
 def add_activity(archive):
     '''Adds metainfo structure for catalysis activity test data.'''
@@ -80,8 +81,13 @@ def add_activity(archive):
         archive.results.properties.catalytic.reaction = Reaction()
 
 class Reagent(ArchiveSection):
-    m_def = Section(label_quantity='name', description='a chemical substance present in the initial reaction mixture')
-    name = Quantity(type=str, a_eln=ELNAnnotation(label='reagent name', component='StringEditQuantity'), description="reagent name")
+    m_def = Section(
+        label_quantity='name',
+        description='a chemical substance present in the initial reaction mixture')
+    name = Quantity(
+        type=str,
+        a_eln=ELNAnnotation(label='reagent name', component='StringEditQuantity'),
+        description="reagent name")
     gas_concentration_in = Quantity(
         type=np.float64, shape=['*'],
         description='Volumetric fraction of reactant in feed.',
@@ -144,7 +150,9 @@ class Reagent(ArchiveSection):
 
 
 class Reactant(Reagent):
-    m_def = Section(label_quantity='name', description='A reagent that has a conversion in a reaction that is not null')
+    m_def = Section(
+        label_quantity='name',
+        description='A reagent that has a conversion in a reaction that is not null')
 
     gas_concentration_out = Quantity(
         type=np.float64, shape=['*'],
@@ -153,14 +161,19 @@ class Reactant(Reagent):
 
     reference = Quantity(type=Reagent, a_eln=dict(component='ReferenceEditQuantity'))
     conversion = Quantity(type=np.float64, shape=['*'])
-    conversion_type = Quantity(type=str, a_eln=dict(component='StringEditQuantity', props=dict(
+    conversion_type = Quantity(
+        type=str,
+        a_eln=dict(component='StringEditQuantity',
+                   props=dict(
         suggestions=['product_based', 'reactant_based', 'unknown'])))
     conversion_product_based = Quantity(type=np.float64, shape=['*'])
     conversion_reactant_based = Quantity(type=np.float64, shape=['*'])
 
 
 class CatalyticSectionConditions_static(ArchiveSection):
-    m_def = Section(description='A class containing reaction conditions of a single run or set of conditions.')
+    m_def = Section(description='''
+        A class containing reaction conditions of a single run or set of conditions.
+                    ''')
 
     repeat_settings_for_next_run = Quantity(
         type=bool, a_eln=ELNAnnotation(component='BoolEditQuantity'))
@@ -169,19 +182,30 @@ class CatalyticSectionConditions_static(ArchiveSection):
         type=np.float64, unit='K', a_eln=ELNAnnotation(component='NumberEditQuantity'))
 
     set_pressure = Quantity(
-        type=np.float64, unit='bar', a_eln=ELNAnnotation(component='NumberEditQuantity', defaultDisplayUnit='bar'))
+        type=np.float64,
+        unit='bar',
+        a_eln=ELNAnnotation(component='NumberEditQuantity', defaultDisplayUnit='bar'))
 
     set_total_flow_rate = Quantity(
-        type=np.float64, unit='mL/minute', a_eln=ELNAnnotation(component='NumberEditQuantity'))
+        type=np.float64,
+        unit='mL/minute',
+        a_eln=ELNAnnotation(component='NumberEditQuantity'))
 
     duration = Quantity(
-        type=np.float64, unit='hour', a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='hour'))
+        type=np.float64,
+        unit='hour',
+        a_eln=dict(component='NumberEditQuantity',
+                   defaultDisplayUnit='hour'))
 
     weight_hourly_space_velocity = Quantity(
-        type=np.float64, unit='mL/(g*hour)', a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='mL/(g*hour)'))
+        type=np.float64, unit='mL/(g*hour)',
+        a_eln=dict(component='NumberEditQuantity',
+                   defaultDisplayUnit='mL/(g*hour)'))
 
     contact_time = Quantity(
-        type=np.float64, unit='g*s/mL', a_eln=ELNAnnotation(label='W|F', component='NumberEditQuantity'))
+        type=np.float64,
+        unit='g*s/mL',
+        a_eln=ELNAnnotation(label='W|F', component='NumberEditQuantity'))
 
     gas_hourly_space_velocity = Quantity(
         type=np.float64, unit='1/hour', a_eln=dict(component='NumberEditQuantity'))
@@ -192,7 +216,9 @@ class CatalyticSectionConditions_static(ArchiveSection):
         a_eln=ELNAnnotation(component='DateTimeEditQuantity', label='Starting Time'))
 
     time_on_stream = Quantity(
-        type=np.float64, unit='hour', a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='hour'))
+        type=np.float64,
+        unit='hour',
+        a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='hour'))
 
     description = Quantity(
         type=str, a_eln=dict(component='RichTextEditQuantity'))
