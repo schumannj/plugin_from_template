@@ -1,45 +1,41 @@
-import numpy as np
 import os
 
+import numpy as np
+import plotly.express as px
+import plotly.graph_objs as go
 from ase.data import chemical_symbols
-
 from nomad.datamodel.data import ArchiveSection, EntryData, UseCaseElnCategory
 from nomad.datamodel.metainfo.annotations import ELNAnnotation
 from nomad.datamodel.metainfo.basesections import (
     CompositeSystem,
     CompositeSystemReference,
-    Measurement)
-from nomad.datamodel.metainfo.plot import PlotSection, PlotlyFigure
-from nomad.datamodel.results import (Results, Material, Properties, CatalyticProperties,
-                                     Catalyst)
+    Measurement,
+)
+from nomad.datamodel.metainfo.plot import PlotlyFigure, PlotSection
+from nomad.datamodel.results import (
+    Catalyst,
+    CatalyticProperties,
+    Material,
+    Properties,
+    Results,
+)
 from nomad.datamodel.results import Product as Product_result
 from nomad.datamodel.results import Reactant as Reactant_result
-from nomad.metainfo import (
-    Quantity,
-    Section,
-    SubSection,
-    SchemaPackage)
+from nomad.metainfo import Quantity, SchemaPackage, Section, SubSection
 from nomad.units import ureg
 
-import plotly.express as px
-import plotly.graph_objs as go
-
 from .catalytic_measurement import (
-    add_activity,
     CatalyticReactionData,
     CatalyticReactionData_core,
     Rates,
     ReactionConditions,
     ReactionConditionsSimple,
-    ReactorSetup
-    )
-
+    ReactorSetup,
+    add_activity,
+)
 from .catalytic_measurement import Product as Product_data
 from .catalytic_measurement import Reactant as Reactant_data
 from .catalytic_measurement import Reagent as Reagent_data
-
-
-
 
 configuration = config.get_plugin_entry_point(
     'nomad_catalysis_plugin.schema_packages:schema'
@@ -61,7 +57,8 @@ def add_catalyst(archive):
 
 def populate_catalyst_sample_info(archive, self, logger):
     '''
-    Copies the catalyst sample information from a reference into the results archive of the measurement.
+    Copies the catalyst sample information from a reference into the results
+    archive of the measurement.
     '''
     if self.samples is not None and self.samples != []:
         if self.samples[0].reference is not None:
@@ -248,7 +245,7 @@ class CatalystSample(CompositeSystem, EntryData):
 
     #Modify the query to search for entries where the 'reference' field matches the CompositeSystem
         if self.lab_id is not None:
-            from nomad.search import search, MetadataPagination
+            from nomad.search import MetadataPagination, search
 
             catalyst_sample = self.m_root().metadata.entry_id
             query = {'entry_references.target_entry_id': catalyst_sample}
@@ -1022,7 +1019,6 @@ class CatalyticReaction(CatalyticReaction_core, PlotSection, EntryData):
                 fig.update_yaxes(title_text='Selectivity (%)')
                 self.figures.append(PlotlyFigure(label='S-X plot '+ name+" Conversion", figure=fig.to_plotly_json()))
 
-        return
 
 
 class CatalyticReaction_NH3decomposition(CatalyticReaction_core, PlotSection, EntryData):

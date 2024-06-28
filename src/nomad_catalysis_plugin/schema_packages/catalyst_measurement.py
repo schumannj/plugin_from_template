@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import os
 from typing import (
     TYPE_CHECKING,
 )
@@ -23,48 +22,29 @@ from typing import (
 import numpy as np
 import plotly.express as px
 import plotly.graph_objs as go
-from plotly.subplots import make_subplots
-import json
-
-from ase.data import chemical_symbols
 from nomad.datamodel.data import (
     ArchiveSection,
-    EntryData,
 )
 from nomad.datamodel.metainfo.annotations import ELNAnnotation
 from nomad.datamodel.metainfo.basesections import (
-    CompositeSystem,
-    CompositeSystemReference,
-    Measurement,
     PubChemPureSubstanceSection,
 )
 from nomad.datamodel.metainfo.plot import PlotlyFigure, PlotSection
 from nomad.datamodel.results import (
-    CatalystCharacterization,
-    CatalystSynthesis,
     CatalyticProperties,
-    Material,
     Properties,
     Reaction,
     Results,
 )
-from nomad.datamodel.results import Product as Product_result
-from nomad.datamodel.results import Reactant as Reactant_result
 from nomad.metainfo import (
     Datetime,
-    Package,
     Quantity,
     Section,
     SubSection,
 )
-from nomad.units import ureg
+
 if TYPE_CHECKING:
-    from nomad.datamodel.datamodel import (
-        EntryArchive,
-    )
-    from structlog.stdlib import (
-        BoundLogger,
-    )
+    pass
 
 
 

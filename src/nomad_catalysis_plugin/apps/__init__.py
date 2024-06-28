@@ -1,11 +1,5 @@
 from nomad.config.models.plugins import AppEntryPoint
-from nomad.config.models.ui import (
-    App,
-    Column,
-    Columns,
-    FilterMenu,
-    FilterMenus
-)
+from nomad.config.models.ui import App, Column, Columns, FilterMenu, FilterMenus
 
 myapp = AppEntryPoint(
     name='MyTestCatalysisApp',
