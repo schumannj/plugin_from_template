@@ -1,44 +1,51 @@
 import numpy as np
 import os
 
+from ase.data import chemical_symbols
+
+from nomad.datamodel.data import ArchiveSection, EntryData, UseCaseElnCategory
+from nomad.datamodel.metainfo.annotations import ELNAnnotation
+from nomad.datamodel.metainfo.basesections import (
+    CompositeSystem,
+    CompositeSystemReference,
+    Measurement)
+from nomad.datamodel.metainfo.plot import PlotSection, PlotlyFigure
+from nomad.datamodel.results import (Results, Material, Properties, CatalyticProperties,
+                                     Catalyst)
+from nomad.datamodel.results import Product as Product_result
+from nomad.datamodel.results import Reactant as Reactant_result
 from nomad.metainfo import (
     Quantity,
     Section,
     SubSection,
-    Package)
-
+    SchemaPackage)
 from nomad.units import ureg
-from ase.data import chemical_symbols
 
-# from nomad.datamodel.metainfo.eln import Measurement
-
-from nomad.datamodel.metainfo.basesections import CompositeSystem, Measurement, CompositeSystemReference
-
-from nomad.datamodel.data import ArchiveSection
-
-from nomad.datamodel.results import (Results, Material, Properties, CatalyticProperties,
-                                     CatalystCharacterization, CatalystSynthesis)
-from nomad.datamodel.results import Product as Product_result
-from nomad.datamodel.results import Reactant as Reactant_result
-
-from nomad.datamodel.data import EntryData, UseCaseElnCategory
-
-from .catalytic_measurement import (
-    CatalyticReactionData, CatalyticReactionData_core, Rates, ReactorSetup, ReactionConditions, ReactionConditionsSimple,
-    add_activity
-    )
-
-from .catalytic_measurement import Product as Product_data
-from .catalytic_measurement import Reagent as Reagent_data
-from .catalytic_measurement import Reactant as Reactant_data
-
-from nomad.datamodel.metainfo.plot import PlotSection, PlotlyFigure
 import plotly.express as px
 import plotly.graph_objs as go
 
-from nomad.datamodel.metainfo.annotations import ELNAnnotation
+from .catalytic_measurement import (
+    add_activity,
+    CatalyticReactionData,
+    CatalyticReactionData_core,
+    Rates,
+    ReactionConditions,
+    ReactionConditionsSimple,
+    ReactorSetup
+    )
 
-m_package = Package(name='catalysis')
+from .catalytic_measurement import Product as Product_data
+from .catalytic_measurement import Reactant as Reactant_data
+from .catalytic_measurement import Reagent as Reagent_data
+
+
+
+
+configuration = config.get_plugin_entry_point(
+    'nomad_catalysis_plugin.schema_packages:schema'
+)
+
+m_package = SchemaPackage()
 
 
 def add_catalyst(archive):
@@ -49,10 +56,8 @@ def add_catalyst(archive):
         archive.results.properties = Properties()
     if not archive.results.properties.catalytic:
         archive.results.properties.catalytic = CatalyticProperties()
-    if not archive.results.properties.catalytic.catalyst_characterization:
-        archive.results.properties.catalytic.catalyst_characterization = CatalystCharacterization()
-    if not archive.results.properties.catalytic.catalyst_synthesis:
-        archive.results.properties.catalytic.catalyst_synthesis = CatalystSynthesis()
+    if not archive.results.properties.catalytic.catalyst:
+        archive.results.properties.catalytic.catalyst = Catalyst()
 
 def populate_catalyst_sample_info(archive, self, logger):
     '''
@@ -63,16 +68,16 @@ def populate_catalyst_sample_info(archive, self, logger):
             add_catalyst(archive)
 
             if self.samples[0].reference.name is not None:
-                archive.results.properties.catalytic.catalyst_synthesis.catalyst_name = self.samples[0].reference.name
+                archive.results.properties.catalytic.catalyst.catalyst_name = self.samples[0].reference.name
                 if not archive.results.material:
                     archive.results.material = Material()
                 archive.results.material.material_name = self.samples[0].reference.name
             if self.samples[0].reference.catalyst_type is not None:
-                archive.results.properties.catalytic.catalyst_synthesis.catalyst_type = self.samples[0].reference.catalyst_type
+                archive.results.properties.catalytic.catalyst.catalyst_type = self.samples[0].reference.catalyst_type
             if self.samples[0].reference.preparation_details is not None:
-                archive.results.properties.catalytic.catalyst_synthesis.preparation_method = self.samples[0].reference.preparation_details.preparation_method
+                archive.results.properties.catalytic.catalyst.preparation_method = self.samples[0].reference.preparation_details.preparation_method
             if self.samples[0].reference.surface is not None:
-                archive.results.properties.catalytic.catalyst_characterization.surface_area = self.samples[0].reference.surface.surface_area
+                archive.results.properties.catalytic.catalyst.surface_area = self.samples[0].reference.surface.surface_area
 
             if self.samples[0].reference.elemental_composition is not None:
                 if not archive.results.material:
@@ -83,6 +88,7 @@ def populate_catalyst_sample_info(archive, self, logger):
 
             except Exception as e:
                 logger.warn('Could not analyse elemental compostion.', exc_info=e)
+                return
 
             for i in self.samples[0].reference.elemental_composition:
                 if i.element not in chemical_symbols:
