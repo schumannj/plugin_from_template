@@ -1,0 +1,8 @@
+diff a/pyproject.toml b/pyproject.toml	(rejected hunks)
+@@ -112,3 +112,6 @@ myparser = "nomad_catalysis_test.parsers:myparser"
+ mypackage = "nomad_catalysis_test.schema_packages:mypackage"
+ 
+ myapp = "nomad_catalysis_test.apps:myapp"
++[tool.cruft]
++# Avoid updating workflow files, this leads to permissions issues
++skip = [".github/*"]
