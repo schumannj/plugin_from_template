@@ -25,7 +25,7 @@ maintainers = [
     { name = "Julia Schumann", email = "jschumann@physik.hu-berlin.de" },
 ]
 license = { file = "LICENSE" }
-dependencies = ["nomad-lab>=1.2.2dev578"]
+dependencies = ["nomad-lab>=1.2.2dev399"]
 
 [project.urls]
 Repository = "https://github.com/schumannj/nomad-catalysis_test"
@@ -112,4 +112,4 @@ myparser = "nomad_catalysis_test.parsers:myparser"
 mypackage = "nomad_catalysis_test.schema_packages:mypackage"
 catalystmeasurement = "nomad_catalysis_test.schema_packages:catalystmeasurement"
 
-myapp = "nomad_catalysis_test.apps:myapp"
+myapp = "nomad_catalysis_test.apps:heterogeneous_catalysis_app"
