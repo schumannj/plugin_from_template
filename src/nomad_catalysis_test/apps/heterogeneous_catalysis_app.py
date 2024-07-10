@@ -157,7 +157,8 @@ dashboard:
         xxl: {h: 4, minH: 3, minW: 8, w: 12, x: 12, y: 20}
     nbins: 30
     x:
-        quantity: results.properties.catalytic.reaction.reaction_conditions.weight_hourly_space_velocity
+        quantity: (results.properties.catalytic.reaction.reaction_conditions.
+        weight_hourly_space_velocity)
         unit: 'ml/(g*s)'
     title: 'Reaction Weight Hourly Space Velocity'
     scale: linear
@@ -175,7 +176,8 @@ dashboard:
         quantity: results.properties.catalytic.reaction.reactants[*].name
     size: 1000
     x:
-        quantity: results.properties.catalytic.reaction.reactants[*].gas_concentration_in
+        quantity: (results.properties.catalytic.reaction.reactants[*].
+        gas_concentration_in)
         title: 'gas concentration (%)'
     y:
         quantity: results.properties.catalytic.reaction.reaction_conditions.temperature
