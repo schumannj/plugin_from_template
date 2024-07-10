@@ -294,3 +294,4 @@ dashboard:
     showinput: true
     type: terms
 """
+)
