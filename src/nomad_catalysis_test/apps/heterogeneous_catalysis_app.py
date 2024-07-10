@@ -1,6 +1,6 @@
 import yaml
 
-solar_cell_app = yaml.safe_load(
+heterogeneous_catalysis_app = yaml.safe_load(
     """
 label: Heterogeneous Catalysis
 path: heterogeneouscatalyst
