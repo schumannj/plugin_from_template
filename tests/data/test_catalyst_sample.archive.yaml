@@ -1,0 +1,4 @@
+data:
+  m_def: nomad_catalysis_test.schema_packages.schema.CatalystSample
+  name: SmMnO3
+  catalyst_type: ['bulk catalyst']

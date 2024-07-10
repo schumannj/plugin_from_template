@@ -1,0 +1,96 @@
+{
+  "data": {
+    "m_def": "nomad_catalysis_test.schema_packages.mypackage.MySchema",
+    "name": "Markus",
+    "message": "Hello Markus!"
+  },
+  "metadata": {
+    "entry_name": "test.archive.yaml",
+    "entry_type": "MySchema",
+    "mainfile": "/workspaces/plugin_from_template/tests/data/test.archive.yaml",
+    "text_search_contents": [
+      "Hello Markus!",
+      "Markus"
+    ],
+    "n_quantities": 9,
+    "quantities": [
+      "",
+      "data",
+      "data.message",
+      "data.name",
+      "metadata",
+      "metadata.entry_name",
+      "metadata.entry_type",
+      "metadata.mainfile",
+      "metadata.quantities",
+      "metadata.section_defs",
+      "metadata.section_defs.definition_id",
+      "metadata.section_defs.definition_qualified_name",
+      "metadata.section_defs.used_directly",
+      "metadata.sections",
+      "results",
+      "results.properties"
+    ],
+    "sections": [
+      "nomad.datamodel.datamodel.EntryArchive",
+      "nomad.datamodel.datamodel.EntryMetadata",
+      "nomad.datamodel.results.Properties",
+      "nomad.datamodel.results.Results",
+      "nomad_catalysis_test.schema_packages.mypackage.MySchema"
+    ],
+    "section_defs": [
+      {
+        "definition_qualified_name": "nomad.datamodel.data.ArchiveSection",
+        "definition_id": "7047cbff9980abff17cce4b1b6b0d1c783505b7f",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.data.EntryData",
+        "definition_id": "538f52fd8d52b29372066f878319c6aeb03b74d2",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.datamodel.EntryArchive",
+        "definition_id": "4f8220ef0081f34a08e0cb211ca52e2ee7cc4d1b",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.datamodel.EntryMetadata",
+        "definition_id": "08e24de48352035bcc932ed9934875ed9b10188e",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.Properties",
+        "definition_id": "f6d62b2664a0c37e0c82d4cb570e5e177e445e05",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.Results",
+        "definition_id": "d77c26594ec0501fb0de8daaa4d7b25d54b9e0cf",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_catalysis_test.schema_packages.mypackage.MySchema",
+        "definition_id": "959d6f9bb7d520e8f3b53f436ff95c1ff5174fcc",
+        "used_directly": true
+      }
+    ],
+    "search_quantities": [
+      {
+        "id": "data.name#nomad_catalysis_test.schema_packages.mypackage.MySchema",
+        "definition": "nomad_catalysis_test.schema_packages.mypackage.MySchema.name",
+        "path_archive": "data.name",
+        "str_value": "Markus"
+      },
+      {
+        "id": "data.message#nomad_catalysis_test.schema_packages.mypackage.MySchema",
+        "definition": "nomad_catalysis_test.schema_packages.mypackage.MySchema.message",
+        "path_archive": "data.message",
+        "str_value": "Hello Markus!"
+      }
+    ]
+  },
+  "results": {
+    "properties": {}
+  }
+}

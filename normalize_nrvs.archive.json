@@ -2,7 +2,7 @@
   "data": {
     "m_def": "nomad_catalysis_test.schema_packages.mypackage.NRVSpectroscopy",
     "name": "test nrvs",
-    "datetime": "2024-07-10T16:02:28.270331+00:00",
+    "datetime": "2024-07-10T17:32:49.364245+00:00",
     "method": "experimental nuclear resonance vibrational spectroscopy",
     "data_file": "ReRH_Nia-C_H_NRVS_exp.dat",
     "samples": [
@@ -2379,11 +2379,11 @@
     "mainfile": "/workspaces/plugin_from_template/tests/data/test_nrvs.archive.yaml",
     "text_search_contents": [
       "test nrvs",
-      "experimental nuclear resonance vibrational spectroscopy",
-      "ReRH_Nia-C_H",
-      "NRVS",
       "ReRH_Nia-C_H_NRVS_exp.dat",
+      "NRVS",
       "NRVS setup",
+      "ReRH_Nia-C_H",
+      "experimental nuclear resonance vibrational spectroscopy",
       "NRVS-setup"
     ],
     "n_quantities": 31,
@@ -2600,7 +2600,7 @@
         "id": "data.datetime#nomad_catalysis_test.schema_packages.mypackage.NRVSpectroscopy",
         "definition": "nomad.datamodel.metainfo.basesections.Activity.datetime",
         "path_archive": "data.datetime",
-        "datetime_value": "2024-07-10T16:02:28.270331+00:00"
+        "datetime_value": "2024-07-10T17:32:49.364245+00:00"
       },
       {
         "id": "data.method#nomad_catalysis_test.schema_packages.mypackage.NRVSpectroscopy",

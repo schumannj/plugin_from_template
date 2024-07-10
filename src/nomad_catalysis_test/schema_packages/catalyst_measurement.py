@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import os
 from typing import (
     TYPE_CHECKING,
 )
@@ -23,41 +22,32 @@ from typing import (
 import numpy as np
 import plotly.express as px
 import plotly.graph_objs as go
-from plotly.subplots import make_subplots
-import json
 
-from ase.data import chemical_symbols
 from nomad.datamodel.data import (
-    ArchiveSection,
-    EntryData,
+    ArchiveSection
 )
 from nomad.datamodel.metainfo.annotations import ELNAnnotation
 from nomad.datamodel.metainfo.basesections import (
-    CompositeSystem,
-    CompositeSystemReference,
-    Measurement,
+    MeasurementResult,
     PubChemPureSubstanceSection,
 )
 from nomad.datamodel.metainfo.plot import PlotlyFigure, PlotSection
 from nomad.datamodel.results import (
-    CatalystCharacterization,
-    CatalystSynthesis,
+    # Catalyst,
     CatalyticProperties,
-    Material,
     Properties,
     Reaction,
     Results,
 )
-from nomad.datamodel.results import Product as Product_result
-from nomad.datamodel.results import Reactant as Reactant_result
+
+from nomad.datamodel.results import ReactionConditions as ReactionConditions_results
 from nomad.metainfo import (
     Datetime,
-    Package,
     Quantity,
     Section,
     SubSection,
 )
-from nomad.units import ureg
+
 if TYPE_CHECKING:
     from nomad.datamodel.datamodel import (
         EntryArchive,
@@ -79,6 +69,9 @@ def add_activity(archive):
         archive.results.properties.catalytic = CatalyticProperties()
     if not archive.results.properties.catalytic.reaction:
         archive.results.properties.catalytic.reaction = Reaction()
+    if not archive.results.properties.catalytic.reaction.reaction_conditions:
+        archive.results.properties.catalytic.reaction.reaction_conditions = (
+        ReactionConditions_results())
 
 class Reagent(ArchiveSection):
     m_def = Section(
@@ -86,7 +79,8 @@ class Reagent(ArchiveSection):
         description='a chemical substance present in the initial reaction mixture')
     name = Quantity(
         type=str,
-        a_eln=ELNAnnotation(label='reagent name', component='StringEditQuantity'),
+        a_eln=ELNAnnotation(label='reagent name',
+                            component='StringEditQuantity'),
         description="reagent name")
     gas_concentration_in = Quantity(
         type=np.float64, shape=['*'],
@@ -95,7 +89,8 @@ class Reagent(ArchiveSection):
     flow_rate = Quantity(
         type=np.float64, shape=['*'], unit='mL/minutes',
         description='Flow rate of reactant in feed.',
-        a_eln=ELNAnnotation(component='NumberEditQuantity'))
+        a_eln=ELNAnnotation(component='NumberEditQuantity',
+                            defaultDisplayUnit='mL/minute'))
 
     pure_component = SubSection(section_def=PubChemPureSubstanceSection)
 
@@ -123,27 +118,39 @@ class Reagent(ArchiveSection):
             self.name = 'maleic anhydride'
         elif '_' in self.name:
             self.name = self.name.replace('_',' ')
-        # elif self.name == 'acetic_acid':
-        #     self.name = 'acetic acid'
+
         if self.name and self.pure_component is None:
             import time
             self.pure_component = PubChemPureSubstanceSection(
                 name=self.name
             )
-            time.sleep(1)
-            self.pure_component.normalize(archive, logger)
-
-        if self.pure_component is not None and self.pure_component.iupac_name is None:
-            if self.pure_component.molecular_formula == 'CO2':
+            if self.name == 'propionic acid':
+                self.pub_chem_id = 1032
+                self.pure_component.iupac_name = 'propanoic acid'
+                self.pure_component.molecular_formula = 'C3H6O2'
+                self.pure_component.molecular_mass = 74.08
+                return
+            elif self.name == 'CO' or self.name == 'carbon monoxide':
+                self.pub_chem_id = 281
+                self.pure_component.iupac_name = 'carbon monoxide'
+                self.pure_component.molecular_formula = 'CO'
+                self.pure_component.molecular_mass = 28.01
+                self.pure_component.inchi = 'InChI=1S/CO/c1-2'
+                self.pure_component.inchi_key = 'UGFAIRIUMAVXCW-UHFFFAOYSA-N'
+                self.pure_component.cas_number = '630-08-0'
+                return
+            elif self.name == 'CO2' or self.name == 'carbon dioxide':
+                self.pub_chem_id = 280
                 self.pure_component.iupac_name = 'carbon dioxide'
-
-        if self.name == "CO" or self.name == "carbon monoxide":
-            self.pure_component.iupac_name = 'carbon monoxide'
-            self.pure_component.molecular_formula = 'CO'
-            self.pure_component.molecular_mass = 28.01
-            self.pure_component.inchi = 'InChI=1S/CO/c1-2'
-            self.pure_component.inchi_key = 'UGFAIRIUMAVXCW-UHFFFAOYSA-N'
-            self.pure_component.cas_number = '630-08-0'
+                self.pure_component.molecular_formula = 'CO2'
+                self.pure_component.molecular_mass = 44.01
+                self.pure_component.inchi = 'InChI=1S/CO2/c2-1-3'
+                self.pure_component.inchi_key = 'CURLTUGMZLYLDI-UHFFFAOYSA-N'
+                self.pure_component.cas_number = '124-38-9'
+                return
+            else:
+                time.sleep(1)
+                self.pure_component.normalize(archive, logger)
 
         if self.name is None and self.pure_component is not None:
             self.name = self.pure_component.molecular_formula
@@ -163,17 +170,16 @@ class Reactant(Reagent):
     conversion = Quantity(type=np.float64, shape=['*'])
     conversion_type = Quantity(
         type=str,
-        a_eln=dict(component='StringEditQuantity',
-                   props=dict(
+        a_eln=dict(component='StringEditQuantity', props=dict(
         suggestions=['product_based', 'reactant_based', 'unknown'])))
     conversion_product_based = Quantity(type=np.float64, shape=['*'])
     conversion_reactant_based = Quantity(type=np.float64, shape=['*'])
 
 
 class CatalyticSectionConditions_static(ArchiveSection):
-    m_def = Section(description='''
-        A class containing reaction conditions of a single run or set of conditions.
-                    ''')
+    m_def = Section(
+        description='A class containing reaction conditions'
+         ' of a single run or set of conditions.')
 
     repeat_settings_for_next_run = Quantity(
         type=bool, a_eln=ELNAnnotation(component='BoolEditQuantity'))
@@ -182,33 +188,31 @@ class CatalyticSectionConditions_static(ArchiveSection):
         type=np.float64, unit='K', a_eln=ELNAnnotation(component='NumberEditQuantity'))
 
     set_pressure = Quantity(
-        type=np.float64,
-        unit='bar',
+        type=np.float64, unit='bar',
         a_eln=ELNAnnotation(component='NumberEditQuantity', defaultDisplayUnit='bar'))
 
     set_total_flow_rate = Quantity(
-        type=np.float64,
-        unit='mL/minute',
-        a_eln=ELNAnnotation(component='NumberEditQuantity'))
+        type=np.float64, unit='mL/minute',
+        a_eln=ELNAnnotation(component='NumberEditQuantity',
+                            defaultDisplayUnit='mL/minute'))
 
     duration = Quantity(
-        type=np.float64,
-        unit='hour',
-        a_eln=dict(component='NumberEditQuantity',
-                   defaultDisplayUnit='hour'))
+        type=np.float64, unit='hour',
+        a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='hour'))
 
     weight_hourly_space_velocity = Quantity(
         type=np.float64, unit='mL/(g*hour)',
-        a_eln=dict(component='NumberEditQuantity',
-                   defaultDisplayUnit='mL/(g*hour)'))
+        a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='mL/(g*hour)'))
 
     contact_time = Quantity(
-        type=np.float64,
-        unit='g*s/mL',
-        a_eln=ELNAnnotation(label='W|F', component='NumberEditQuantity'))
+        type=np.float64, unit='g*s/mL',
+        a_eln=ELNAnnotation(label='W|F',
+                            component='NumberEditQuantity',
+                            defaultDisplayUnit='g*s/mL'))
 
     gas_hourly_space_velocity = Quantity(
-        type=np.float64, unit='1/hour', a_eln=dict(component='NumberEditQuantity'))
+        type=np.float64, unit='1/hour',
+        a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='1/hour'))
 
     datetime = Quantity(
         type=Datetime,
@@ -216,8 +220,7 @@ class CatalyticSectionConditions_static(ArchiveSection):
         a_eln=ELNAnnotation(component='DateTimeEditQuantity', label='Starting Time'))
 
     time_on_stream = Quantity(
-        type=np.float64,
-        unit='hour',
+        type=np.float64, unit='hour',
         a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='hour'))
 
     description = Quantity(
@@ -248,36 +251,63 @@ class CatalyticSectionConditions_static(ArchiveSection):
 
         if self.weight_hourly_space_velocity is None and self.set_total_flow_rate is not None:
             try:
-                self.weight_hourly_space_velocity = self.set_total_flow_rate / self.m_root().data.reactor_filling.catalyst_mass
+                self.weight_hourly_space_velocity = (
+                self.set_total_flow_rate
+                    / self.m_root().data.reactor_filling.catalyst_mass)
             except:
-                logger.warning('The catalyst mass is not defined. Needed to calculate the weight hourly space velocity.')
+                logger.warning('The catalyst mass is not defined. '
+                               'Needed to calculate the weight hourly space velocity.')
                 return
         if self.contact_time is None and self.weight_hourly_space_velocity is not None:
             self.contact_time = 1 / self.weight_hourly_space_velocity
 
-        if self.gas_hourly_space_velocity is None and self.set_total_flow_rate is not None:
+        if self.gas_hourly_space_velocity is None and (
+            self.set_total_flow_rate is not None):
             if self.m_root().data.reactor_filling.apparent_catalyst_volume is not None:
-                self.gas_hourly_space_velocity = self.set_total_flow_rate / self.m_root().data.reactor_filling.apparent_catalyst_volume
+                self.gas_hourly_space_velocity = (self.set_total_flow_rate
+                / self.m_root().data.reactor_filling.apparent_catalyst_volume)
+            # except:
+            #     logger.warning('The apparent catalyst volume is not defined. The gas hourly space velocity cannot be calculated.')
+            #     return
+
+        # add_activity(archive)
+        # if self.set_temperature is not None:
+        #     archive.results.properties.catalytic.reaction.temperature = self.set_temperature
+        # if self.set_pressure is not None:
+        #     archive.results.properties.catalytic.reaction.pressure = self.set_pressure
+        # if self.set_total_flow_rate is not None:
+        #     archive.results.properties.catalytic.reaction.flow_rate = self.set_total_flow_rate
+        # if self.weight_hourly_space_velocity is not None:
+        #     archive.results.properties.catalytic.reaction.weight_hourly_space_velocity = self.weight_hourly_space_velocity
+
 
 
 class CatalyticSectionConditions_dynamic(CatalyticSectionConditions_static):
-    m_def = Section(description='A class containing reaction conditions of a generic reaction with changing conditions.')
+    m_def = Section(
+        description='A class containing reaction conditions '
+        'of a generic reaction with changing conditions.')
 
     set_temperature = Quantity(
-        type=np.float64, unit='K', a_eln=dict(label='Set temperature section start', component='NumberEditQuantity'))
+        type=np.float64, unit='K',
+        a_eln=dict(label='Set temperature section start', component='NumberEditQuantity'))
 
     set_temperature_section_stop = Quantity(
         type=np.float64, unit='K', a_eln=dict(component='NumberEditQuantity'))
 
     set_pressure = Quantity(
-        type=np.float64, unit='bar', a_eln=dict(label='Set pressure section start', component='NumberEditQuantity', defaultDisplayUnit='bar'))
+        type=np.float64, unit='bar',
+        a_eln=dict(label='Set pressure section start',
+                   component='NumberEditQuantity', defaultDisplayUnit='bar'))
 
     set_pressure_section_stop = Quantity(
-        type=np.float64, unit='bar', a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='bar'))
+        type=np.float64, unit='bar',
+        a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='bar'))
 
 
 class ReactionConditionsSimple(PlotSection, ArchiveSection):
-    m_def = Section(description='A class containing reaction conditions for a generic reaction. with seperated runs containing the conditions')
+    m_def = Section(description='A class containing reaction conditions '
+                    'for a generic reaction. '
+                    'With seperated runs containing the conditions')
 
     number_of_sections = Quantity(
         type=np.int32,
@@ -285,9 +315,11 @@ class ReactionConditionsSimple(PlotSection, ArchiveSection):
         a_eln=dict(component='NumberEditQuantity'))
 
     total_time_on_stream = Quantity(
-        type=np.float64, unit='hour', a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='hour'))
+        type=np.float64, unit='hour',
+        a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='hour'))
 
-    section_runs = SubSection(section_def=CatalyticSectionConditions_static, repeats=True)
+    section_runs = SubSection(section_def=CatalyticSectionConditions_static,
+                              repeats=True)
 
     def normalize(self, archive, logger):
         super(ReactionConditionsSimple, self).normalize(archive, logger)
@@ -447,22 +479,29 @@ class ReactionConditions(PlotSection, ArchiveSection):
     m_def = Section(description='A class containing reaction conditions for a generic reaction.')
 
     set_temperature = Quantity(
-        type=np.float64, shape=['*'], unit='K', a_eln=ELNAnnotation(component='NumberEditQuantity'))
+        type=np.float64, shape=['*'], unit='K',
+        a_eln=ELNAnnotation(component='NumberEditQuantity'))
 
     set_pressure = Quantity(
-        type=np.float64, shape=['*'], unit='bar', a_eln=ELNAnnotation(component='NumberEditQuantity', defaultDisplayUnit='bar'))
+        type=np.float64, shape=['*'], unit='bar',
+        a_eln=ELNAnnotation(component='NumberEditQuantity', defaultDisplayUnit='bar'))
 
     set_total_flow_rate = Quantity(
-        type=np.float64, shape=['*'], unit='mL/minute', a_eln=ELNAnnotation(component='NumberEditQuantity', defaultDisplayUnit='mL/minute'))
+        type=np.float64, shape=['*'], unit='mL/minute',
+        a_eln=ELNAnnotation(component='NumberEditQuantity', defaultDisplayUnit='mL/minute'))
 
     weight_hourly_space_velocity = Quantity(
-        type=np.float64, shape=['*'], unit='mL/(g*hour)', a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='mL/(g*hour)'))
+        type=np.float64, shape=['*'], unit='mL/(g*hour)',
+        a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='mL/(g*hour)'))
 
     contact_time = Quantity(
-        type=np.float64, shape=['*'], unit='g*s/mL', a_eln=ELNAnnotation(label='W|F', defaultDisplayUnit='g*s/mL', component='NumberEditQuantity'))
+        type=np.float64, shape=['*'], unit='g*s/mL',
+        a_eln=ELNAnnotation(label='W|F', defaultDisplayUnit='g*s/mL',
+                            component='NumberEditQuantity'))
 
     gas_hourly_space_velocity = Quantity(
-        type=np.float64, shape=['*'], unit='1/hour', a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='1/hour'))
+        type=np.float64, shape=['*'], unit='1/hour',
+        a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='1/hour'))
 
     runs = Quantity(type=np.float64, shape=['*'])
 
@@ -472,7 +511,8 @@ class ReactionConditions(PlotSection, ArchiveSection):
         a_eln=dict(component='NumberEditQuantity'))
 
     time_on_stream = Quantity(
-        type=np.float64, shape=['*'], unit='hour', a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='hour'))
+        type=np.float64, shape=['*'], unit='hour',
+        a_eln=dict(component='NumberEditQuantity', defaultDisplayUnit='hour'))
 
     reagents = SubSection(section_def=Reagent, repeats=True)
 
@@ -480,6 +520,84 @@ class ReactionConditions(PlotSection, ArchiveSection):
         super(ReactionConditions, self).normalize(archive, logger)
         for reagent in self.reagents:
             reagent.normalize(archive, logger)
+
+        # if self.runs is None and self.set_temperature is not None:
+        #     number_of_runs=len(self.set_temperature)
+        #     self.runs= np.linspace(0, number_of_runs - 1, number_of_runs)
+        # elif self.runs is None and self.set_pressure is not None:
+        #     number_of_runs=len(self.set_pressure)
+        # elif self.runs is None and self.set_total_flow_rate is not None:
+        #     number_of_runs=len(self.set_total_flow_rate)
+        # elif self.runs is None and self.gas_hourly_space_velocity is not None:
+        #     number_of_runs=len(self.gas_hourly_space_velocity)
+        # elif self.runs is None and self.weight_hourly_space_velocity is not None:
+        #     number_of_runs=len(self.weight_hourly_space_velocity)
+        # elif self.runs is None and self.time_on_stream is not None:
+        #     number_of_runs=len(self.time_on_stream)
+        # elif self.runs is None and self.reagents[0].gas_concentration_in is not None:
+        #     number_of_runs=len(self.reagents[0].gas_concentration_in)
+        # elif self.runs is not None:
+        #     number_of_runs=len(self.runs)
+        # else:
+        #     number_of_runs=1
+
+
+        # if self.set_pressure is not None:
+        #     if len(self.set_pressure) == 1:
+        #         for n in range(number_of_runs-1):
+        #             self.set_pressure=np.append(self.set_pressure, self.set_pressure[0])
+
+        # if self.set_total_flow_rate is None and self.reagents is not None:
+        #     self.set_total_flow_rate = np.array([])
+        #     for n in range(number_of_runs):
+        #         total_flow_rate=0
+        #         for reagent in self.reagents:
+        #             if reagent.flow_rate is not None:
+        #                 if len(reagent.flow_rate) == 1:
+        #                     for m in range(number_of_runs-1):
+        #                         reagent.flow_rate=np.append(reagent.flow_rate, reagent.flow_rate[0])
+        #                 elif len(reagent.flow_rate) != number_of_runs:
+        #                     raise ValueError('The number of flow rates is not equal to the number of runs')
+        #                 total_flow_rate+=reagent.flow_rate[n]
+        #         self.set_total_flow_rate=np.append(self.set_total_flow_rate, total_flow_rate)
+
+        # if self.set_total_flow_rate is not None:
+        #     if len(self.set_total_flow_rate) == 1:
+        #         set_total_flow_rate=[]
+        #         for n in range(number_of_runs):
+        #             set_total_flow_rate.append(self.set_total_flow_rate)
+        #         self.set_total_flow_rate=set_total_flow_rate
+
+        # for reagent in self.reagents:
+        #     if reagent.gas_concentration_in is not None:
+        #         if len(reagent.gas_concentration_in) == 1:
+        #             gas_concentration_in=[]
+        #             for n in range(number_of_runs):
+        #                 gas_concentration_in.append(reagent.gas_concentration_in)
+        #             reagent.gas_concentration_in=gas_concentration_in
+        #         elif len(reagent.gas_concentration_in) != number_of_runs:
+        #             print(len(reagent.gas_concentration_in), number_of_runs)
+        #             raise ValueError('The number of gas concentrations is not equal to the number of runs')
+
+        #     if reagent.flow_rate is not None:
+        #         if len(reagent.flow_rate) == 1:
+        #             for n in range(number_of_runs):
+        #                 reagent.flow_rate.append(reagent.flow_rate[0])
+        #         elif len(reagent.flow_rate) != number_of_runs:
+        #             raise ValueError('The number of flow rates is not equal to the number of runs')
+
+        # add_activity(archive)
+
+        # if self.set_temperature is not None:
+        #     archive.results.properties.catalytic.reaction.temperature = self.set_temperature
+        # if self.set_pressure is not None:
+        #     archive.results.properties.catalytic.reaction.pressure = self.set_pressure
+        # if self.set_total_flow_rate is not None:
+        #     archive.results.properties.catalytic.reaction.flow_rate = self.set_total_flow_rate
+        # if self.weight_hourly_space_velocity is not None:
+        #     archive.results.properties.catalytic.reaction.weight_hourly_space_velocity = self.weight_hourly_space_velocity
+        # if self.reagents is not None:
+        #     archive.results.properties.catalytic.reaction.reactants = self.reagents
 
         #Figures definitions for ReactionConditions Subsection:
         if self.time_on_stream is not None:
@@ -602,7 +720,7 @@ class ReactorSetup(ArchiveSection):
                               a_eln=dict(component='NumberEditQuantity'))
 
 
-class CatalyticReactionData_core(ArchiveSection):
+class CatalyticReactionData_core(MeasurementResult):
     temperature = Quantity(
         type=np.float64, shape=['*'], unit='°C', a_eln=ELNAnnotation(component='NumberEditQuantity'))
 
