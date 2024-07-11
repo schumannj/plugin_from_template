@@ -4,7 +4,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objs as go
 from ase.data import chemical_symbols
-from nomad.datamodel.data import ArchiveSection, EntryData, UseCaseElnCategory
+from nomad.datamodel.data import ArchiveSection, Schema, UseCaseElnCategory
 from nomad.datamodel.metainfo.annotations import ELNAnnotation
 from nomad.datamodel.metainfo.basesections import (
     CompositeSystem,
@@ -65,23 +65,28 @@ def populate_catalyst_sample_info(archive, self, logger):
             add_catalyst(archive)
 
             if self.samples[0].reference.name is not None:
-                archive.results.properties.catalytic.catalyst.catalyst_name = self.samples[0].reference.name
+                archive.results.properties.catalytic.catalyst.catalyst_name = (
+                    self.samples[0].reference.name)
                 if not archive.results.material:
                     archive.results.material = Material()
                 archive.results.material.material_name = self.samples[0].reference.name
             if self.samples[0].reference.catalyst_type is not None:
-                archive.results.properties.catalytic.catalyst.catalyst_type = self.samples[0].reference.catalyst_type
+                archive.results.properties.catalytic.catalyst.catalyst_type = (
+                    self.samples[0].reference.catalyst_type)
             if self.samples[0].reference.preparation_details is not None:
-                archive.results.properties.catalytic.catalyst.preparation_method = self.samples[0].reference.preparation_details.preparation_method
+                archive.results.properties.catalytic.catalyst.preparation_method = (
+                    self.samples[0].reference.preparation_details.preparation_method)
             if self.samples[0].reference.surface is not None:
-                archive.results.properties.catalytic.catalyst.surface_area = self.samples[0].reference.surface.surface_area
+                archive.results.properties.catalytic.catalyst.surface_area = (
+                    self.samples[0].reference.surface.surface_area)
 
             if self.samples[0].reference.elemental_composition is not None:
                 if not archive.results.material:
                     archive.results.material = Material()
 
             try:
-                archive.results.material.elemental_composition = self.samples[0].reference.elemental_composition
+                archive.results.material.elemental_composition = (
+                    self.samples[0].reference.elemental_composition)
 
             except Exception as e:
                 logger.warn('Could not analyse elemental compostion.', exc_info=e)
@@ -102,7 +107,8 @@ class Preparation(ArchiveSection):
         type=str,
         shape=[],
         description="""
-          Classification of the dominant preparation step in the catalyst synthesis procedure.
+          Classification of the dominant preparation step in the
+          catalyst synthesis procedure.
           """,
         a_eln=dict(
             component='EnumEditQuantity', props=dict(
@@ -132,16 +138,19 @@ class Preparation(ArchiveSection):
     )
 
     def normalize(self, archive, logger):
-        super(Preparation, self).normalize(archive, logger)
+        super().normalize(archive, logger)
 
         add_catalyst(archive)
 
         if self.preparation_method is not None:
-            archive.results.properties.catalytic.catalyst_characterization.preparation_method = self.preparation_method
+            archive.results.properties.catalytic.catalyst.preparation_method = (
+                self.preparation_method)
 
 
 class SurfaceArea(ArchiveSection):
-    m_def = Section(label_quantity='method_surface_area_determination', a_eln=ELNAnnotation(label='Surface Area'))
+    m_def = Section(
+        label_quantity='method_surface_area_determination',
+        a_eln=ELNAnnotation(label='Surface Area'))
 
     surface_area = Quantity(
         type=np.float64,
@@ -160,8 +169,8 @@ class SurfaceArea(ArchiveSection):
         a_eln=dict(
             component='EnumEditQuantity', props=dict(
                 suggestions=['BET', 'H2-TPD', 'N2O-RFC',
-                             'Fourier Transform Infrared Spectroscopy (FTIR) of adsorbates',
-                             'unknown']))
+                             'Fourier Transform Infrared Spectroscopy (FT-IR) '
+                             'of adsorbates', 'unknown']))
     )
 
     dispersion = Quantity(
@@ -174,17 +183,19 @@ class SurfaceArea(ArchiveSection):
     )
 
     def normalize(self, archive, logger):
-        super(SurfaceArea, self).normalize(archive, logger)
+        super().normalize(archive, logger)
 
         add_catalyst(archive)
 
         if self.surface_area is not None:
-            archive.results.properties.catalytic.catalyst_characterization.surface_area = self.surface_area
+            archive.results.properties.catalytic.catalyst.surface_area = (
+                self.surface_area)
         if self.method_surface_area_determination is not None:
-            archive.results.properties.catalytic.catalyst_characterization.method_surface_area = self.method_surface_area_determination
+            archive.results.properties.catalytic.catalyst.characterization_methods.append(
+                self.method_surface_area_determination)
 
 
-class CatalystSample(CompositeSystem, EntryData):
+class CatalystSample(CompositeSystem, Schema):
     m_def = Section(
         label='Heterogeneous Catalysis - Catalyst Sample',
         categories=[UseCaseElnCategory],
@@ -192,7 +203,9 @@ class CatalystSample(CompositeSystem, EntryData):
 
     preparation_details = SubSection(section_def=Preparation)
 
-    surface = SubSection(section_def=SurfaceArea, a_eln=ELNAnnotation(label='Surface Area'))
+    surface = SubSection(
+        section_def=SurfaceArea,
+        a_eln=ELNAnnotation(label='Surface Area'))
 
     storing_institution = Quantity(
         type=str,
@@ -213,8 +226,8 @@ class CatalystSample(CompositeSystem, EntryData):
           """,
         a_eln=dict(
             component='EnumEditQuantity', props=dict(
-                suggestions=['bulk catalyst', 'supported catalyst', 'single crystal','metal','oxide',
-                             '2D catalyst', 'other', 'unkown']),
+                suggestions=['bulk catalyst', 'supported catalyst', 'single crystal',
+                             'metal','oxide', '2D catalyst', 'other', 'unkown']),
         ),
         links=['https://w3id.org/nfdi4cat/voc4cat_0007014'],
     )
@@ -232,18 +245,21 @@ class CatalystSample(CompositeSystem, EntryData):
     )
 
     def normalize(self, archive, logger):
-        super(CatalystSample, self).normalize(archive, logger)
+        super().normalize(archive, logger)
 
         add_catalyst(archive)
 
         if self.catalyst_type is not None:
-            archive.results.properties.catalytic.catalyst_synthesis.catalyst_type = self.catalyst_type
+            archive.results.properties.catalytic.catalyst.catalyst_type = (
+                self.catalyst_type)
         if self.preparation_details is not None:
-            archive.results.properties.catalytic.catalyst_synthesis.preparation_method = self.preparation_details.preparation_method
+            archive.results.properties.catalytic.catalyst.preparation_method = (
+                self.preparation_details.preparation_method)
 
-    ### testing how to add referenced methods to results#####:
-
-    #Modify the query to search for entries where the 'reference' field matches the CompositeSystem
+        ### testing how to add referenced methods to results#####:
+        '''search for entries where the 'reference'
+        field matches the catalyst sample
+        '''
         if self.lab_id is not None:
             from nomad.search import MetadataPagination, search
 
@@ -271,17 +287,21 @@ class CatalystSample(CompositeSystem, EntryData):
                     #     methods.append(method)
                 if search_result.pagination.total > 10:
                     logger.warn(
-                        f'Found {search_result.pagination.total} entries with entry_id: '
-                        f'"{catalyst_sample}". Will only check the the first 10 entries found for XRD method.'
+                        f'Found {search_result.pagination.total} entries with '
+                        'entry_id: 'f'"{catalyst_sample}". Will only check the the '
+                        'first 10 entries found for XRD method.'
                     )
-                archive.results.properties.catalytic.catalyst_characterization.method = methods
+                (archive.results.properties.catalytic.catalyst.characterization_methods.
+                 append(methods))
             else:
                 logger.warn(f'Found no entries with reference: "{catalyst_sample}".')
 
 
 class ReactorFilling(ArchiveSection):
-    m_def = Section(description='A class containing information about the catalyst and filling in the reactor.',
-                    label='Catalyst')
+    m_def = Section(
+        description='A class containing information about the catalyst '
+        'and filling in the reactor.',
+        label='Catalyst')
 
     catalyst_name = Quantity(
         type=str, shape=[], a_eln=ELNAnnotation(component='StringEditQuantity'))
