@@ -67,75 +67,68 @@ def add_catalyst(archive):
     if not archive.results.properties.catalytic.catalyst:
         archive.results.properties.catalytic.catalyst = Catalyst()
 
-def populate_catalyst_sample_info(archive, self, logger):
+#helper function to retrieve nested attributes
+def get_nested_attr(obj, attr_path):
+    for attr in attr_path.split('.'):
+        obj = getattr(obj, attr, None)
+        if obj is None:
+            return None
+    return obj
+
+def populate_catalyst_sample_info(archive, self, logger, reference=False):
     '''
     Copies the catalyst sample information from a reference
     into the results archive of the measurement.
     '''
-    print('now populating info from sample')
-    if self.samples is not None and self.samples != []:
-        if self.samples[0].reference is not None:
-            add_catalyst(archive)
-            quantities_results_data={
-                self.samples[0].reference.name: archive.results.properties.catalytic.catalyst.catalyst_name,
-                self.samples[0].reference.catalyst_type: archive.results.properties.catalytic.catalyst.catalyst_type,
-                self.samples[0].reference.preparation_details: archive.results.properties.catalytic.catalyst.preparation_method,
-                self.samples[0].reference.surface: archive.results.properties.catalytic.catalyst.surface_area
-            }
+    if reference:
+        sample_obj = self.samples[0].reference
+    else:
+        sample_obj = self
 
-            for i in quantities_results_data:
-                print(i)
-                if i is not None:
-                    try:
-                        print('try to write in results section')
-                        print(quantities_results_data[i])
-                        quantities_results_data[i] = i
-                    except isinstance(i, list):
-                        for j in i:
-                            quantities_results_data[i].append(j)
+    add_catalyst(archive)
+    quantities_results_mapping={
+        'name': 'catalyst_name',
+        'catalyst_type': 'catalyst_type',
+        'preparation_details.preparation_method': 'preparation_method',
+        'surface.surface_area': 'surface_area'
+    }
 
-            # if self.samples[0].reference.name is not None:
-            #     archive.results.properties.catalytic.catalyst.catalyst_name = (
-            #         self.samples[0].reference.name)
-            #     if not archive.results.material:
-            #         archive.results.material = Material()
-            #     archive.results.material.material_name = self.samples[0].reference.name
-            # if self.samples[0].reference.catalyst_type is not None and (
-            #     self.samples[0].reference.catalyst_type !=[]):
-            #     if archive.results.properties.catalytic.catalyst.catalyst_type is None:
-            #         archive.results.properties.catalytic.catalyst.catalyst_type = []
-            #     if isinstance(self.samples[0].reference.catalyst_type, str):
-            #         archive.results.properties.catalytic.catalyst.catalyst_type.append(
-            #             self.samples[0].reference.catalyst_type)
-            #     elif isinstance(self.samples[0].reference.catalyst_type, list):
-            #         for i in self.samples[0].reference.catalyst_type:
-            #             (archive.results.properties.catalytic.catalyst.catalyst_type.
-            #              append(i))
-            # if self.samples[0].reference.preparation_details is not None:
-            #     archive.results.properties.catalytic.catalyst.preparation_method = (
-            #         self.samples[0].reference.preparation_details.preparation_method)
-            # if self.samples[0].reference.surface is not None:
-            #     archive.results.properties.catalytic.catalyst.surface_area = (
-            #         self.samples[0].reference.surface.surface_area)
-
-            if self.samples[0].reference.elemental_composition is not None:
-                if not archive.results.material:
-                    archive.results.material = Material()
+    #Loop through the mapping and assign the values
+    for ref_attr, catalyst_attr in quantities_results_mapping.items():
+        value = get_nested_attr(sample_obj, ref_attr)
+        if value is not None:
             try:
-                archive.results.material.elemental_composition = (
-                    self.samples[0].reference.elemental_composition)
+                setattr(archive.results.properties.catalytic.catalyst,
+                    catalyst_attr, value)
+            except ValueError:
+                setattr(archive.results.properties.catalytic.catalyst,
+                        catalyst_attr, [value])
+            except:
+                logger.warn('Something else went wrong when trying setattr')
+    if reference:
+        if self.samples[0].reference.name is not None:
+            if not archive.results.material:
+                archive.results.material = Material()
+            archive.results.material.material_name = self.samples[0].reference.name
 
-            except Exception as e:
-                logger.warn('Could not analyse elemental compostion.', exc_info=e)
+        if self.samples[0].reference.elemental_composition is not None:
+            if not archive.results.material:
+                archive.results.material = Material()
+        try:
+            archive.results.material.elemental_composition = (
+                self.samples[0].reference.elemental_composition)
 
-            for i in self.samples[0].reference.elemental_composition:
-                if i.element not in chemical_symbols:
-                    logger.warn(
-                        f"'{i.element}' is not a valid element symbol and this "
-                        'elemental_composition section will be ignored.'
-                    )
-                elif i.element not in archive.results.material.elements:
-                    archive.results.material.elements += [i.element]
+        except Exception as e:
+            logger.warn('Could not analyse elemental compostion.', exc_info=e)
+
+        for i in self.samples[0].reference.elemental_composition:
+            if i.element not in chemical_symbols:
+                logger.warn(
+                    f"'{i.element}' is not a valid element symbol and this "
+                    'elemental_composition section will be ignored.'
+                )
+            elif i.element not in archive.results.material.elements:
+                archive.results.material.elements += [i.element]
 
 def add_referencing_methods_to_sample_result(self, archive, logger, number):
     if self.lab_id is not None:
@@ -217,12 +210,6 @@ class Preparation(ArchiveSection):
     def normalize(self, archive, logger):
         super().normalize(archive, logger)
 
-        add_catalyst(archive)
-
-        if self.preparation_method is not None:
-            archive.results.properties.catalytic.catalyst.preparation_method = (
-                self.preparation_method)
-
 
 class SurfaceArea(ArchiveSection):
     m_def = Section(
@@ -263,19 +250,10 @@ class SurfaceArea(ArchiveSection):
     def normalize(self, archive, logger):
         super().normalize(archive, logger)
 
-        add_catalyst(archive)
-
-        if self.surface_area is not None:
-            archive.results.properties.catalytic.catalyst.surface_area = (
-                self.surface_area)
         if self.method_surface_area_determination is not None:
-            if (archive.results.properties.catalytic.catalyst.
-                characterization_methods) is None:
-                (archive.results.properties.catalytic.catalyst.
-                 characterization_methods) = []
+            add_catalyst()
             (archive.results.properties.catalytic.catalyst.characterization_methods.
-             append(self.method_surface_area_determination))
-
+            append(self.method_surface_area_determination))
 
 class CatalystSample(CompositeSystem, Schema):
     m_def = Section(
@@ -283,7 +261,8 @@ class CatalystSample(CompositeSystem, Schema):
         categories=[UseCaseElnCategory],
     )
 
-    preparation_details = SubSection(section_def=Preparation)
+    preparation_details = SubSection(section_def=Preparation,
+                                     a_eln=ELNAnnotation(label='Preparation Details'))
 
     surface = SubSection(section_def=SurfaceArea,
                          a_eln=ELNAnnotation(label='Surface Area'))
@@ -333,22 +312,7 @@ class CatalystSample(CompositeSystem, Schema):
         else:
             super().normalize(archive, logger)
 
-        add_catalyst(archive)
-        if self.name is not None:
-            archive.results.properties.catalytic.catalyst.catalyst_name = self.name
-        if isinstance(self.catalyst_type, str):
-            if archive.results.properties.catalytic.catalyst.catalyst_type is None:
-                archive.results.properties.catalytic.catalyst.catalyst_type = []
-            archive.results.properties.catalytic.catalyst.catalyst_type.append(
-                self.catalyst_type)
-        elif isinstance(self.catalyst_type, list):
-            if archive.results.properties.catalytic.catalyst.catalyst_type is None:
-                archive.results.properties.catalytic.catalyst.catalyst_type = []
-            for i in self.catalyst_type:
-                archive.results.properties.catalytic.catalyst.catalyst_type.append(i)
-        if self.preparation_details is not None:
-            archive.results.properties.catalytic.catalyst.preparation_method = (
-                self.preparation_details.preparation_method)
+        populate_catalyst_sample_info(archive, self, logger)
 
         from nomad.datamodel.context import ClientContext
         if isinstance(archive.m_context, ClientContext):
@@ -596,7 +560,9 @@ class SimpleCatalyticReaction(CatalyticReaction_core, EntryData):
         if self.reaction_class is not None:
             archive.results.properties.catalytic.reaction.type = self.reaction_class
 
-        populate_catalyst_sample_info(archive, self, logger)
+        if self.samples is not None and self.samples != []:
+            if self.samples[0].reference is not None:
+                populate_catalyst_sample_info(archive, self, logger, reference=True)
 
 
 class CatalyticReactionCleanData(CatalyticReaction_core, PlotSection, EntryData):
@@ -801,7 +767,9 @@ class CatalyticReactionCleanData(CatalyticReaction_core, PlotSection, EntryData)
                         logger.warn('There is already a sample in the measurement. '
                                     'The sample from the data file will be added but '
                                     'sample info not written in the results section.')
-                populate_catalyst_sample_info(archive, self, logger)
+        if self.samples is not None and self.samples != []:
+            if self.samples[0].reference is not None:
+                populate_catalyst_sample_info(archive, self, logger, reference=True)
 
         for reagent in reagents:
             reagent.normalize(archive, logger)
@@ -1049,7 +1017,8 @@ class CatalyticReaction(CatalyticReaction_core, PlotSection, EntryData):
                 sample.normalize(archive, logger)
                 self.samples = []
                 self.samples.append(sample)
-            populate_catalyst_sample_info(archive, self, logger)
+            if self.samples[0].reference is not None:
+                populate_catalyst_sample_info(archive, self, logger, reference=True)
 
         if self.results is None or self.results == []:
             return
@@ -1317,7 +1286,9 @@ class CatalyticReaction_NH3decomposition(CatalyticReaction_core, PlotSection, En
         archive.results.properties.catalytic.reaction.name = self.reaction_name
         archive.results.properties.catalytic.reaction.type = self.reaction_class
 
-        populate_catalyst_sample_info(archive, self, logger)
+        if self.samples is not None and self.samples != []:
+            if self.samples[0].reference is not None:
+                populate_catalyst_sample_info(archive, self, logger, reference=True)
 
         self.figures = []
         fig = px.line(x=self.results[0].time_on_stream, y=self.results[0].temperature.to('celsius'))
